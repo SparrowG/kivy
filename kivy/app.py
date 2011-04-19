@@ -52,6 +52,7 @@ The relation between main.py and test.kv is explained in :func:`App.load_kv`.
 from inspect import getfile
 from os.path import dirname, join, exists
 from kivy.base import runTouchApp, stopTouchApp
+from kivy.logger import Logger
 from kivy.event import EventDispatcher
 from kivy.lang import Builder
 
@@ -65,6 +66,12 @@ class App(EventDispatcher):
             :func:`~kivy.base.runTouchApp` call.
         `on_stop`:
             Fired when the application stops.
+
+    :Parameters:
+        `kv_directory`: <path>, default to None
+            If a kv_directory is set, it will be used to get the initial kv
+            file. By default, the file is searched in the same directory as the
+            current App definition file.
     '''
 
     title = None
@@ -142,10 +149,12 @@ class App(EventDispatcher):
             clsname = clsname[:-3]
         filename = join(directory, '%s.kv' % clsname.lower())
         if not exists(filename):
-            return
+            Logger.debug('App: kv <%s> not found' % filename)
+            return False
         root = Builder.load_file(filename)
         if root:
             self.root = root
+        return True
 
     def get_application_name(self):
         if self.title is not None:
