@@ -1,17 +1,37 @@
-import sys
+import kivy
+kivy.require('1.0.6')
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.button import Button
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.slider import Slider
+from kivy.uix.widget import Widget
+from kivy.uix.scatter import Scatter
 from kivy.uix.textinput import TextInput
 from kivy.uix.treeview import TreeView, TreeViewLabel
+
+
+class Showcase(FloatLayout):
+    pass
+
+
+class KivyImageScatter(Scatter):
+    pass
+
+
+class ButtonsScatter(Scatter):
+    pass
 
 
 class ShowcaseApp(App):
 
     def on_select_node(self, instance, value):
+        # ensure that any keybaord is released
+        self.content.get_parent_window().release_keyboard()
+
         self.content.clear_widgets()
         try:
             w = getattr(self, 'show_%s' %
@@ -39,6 +59,9 @@ class ShowcaseApp(App):
         n = create_tree('Sliders')
         attach_node('Horizontal sliders', n)
         attach_node('Vertical sliders', n)
+        n = create_tree('Scatter')
+        attach_node('Scatter with image', n)
+        attach_node('Scatter with buttons', n)
         n = create_tree('Textinput')
         attach_node('Monoline textinput', n)
         attach_node('Multiline textinput', n)
@@ -48,7 +71,22 @@ class ShowcaseApp(App):
         root.add_widget(tree)
         self.content = content = BoxLayout()
         root.add_widget(content)
-        return root
+        sc = Showcase()
+        sc.content.add_widget(root)
+        return sc
+
+    def show_scatter_with_image(self):
+        s = KivyImageScatter(center=self.content.center)
+        col = Widget()
+        col.add_widget(s)
+        return col
+
+    def show_scatter_with_buttons(self):
+        s = ButtonsScatter(size=(300, 200))
+        s.center = self.content.center
+        col = Widget()
+        col.add_widget(s)
+        return col
 
     def show_standard_buttons(self):
         col = BoxLayout(spacing=10)
@@ -105,5 +143,5 @@ class ShowcaseApp(App):
         return tv
 
 
-if __name__ == '__main__':
+if __name__ in ('__main__', '__android__'):
     ShowcaseApp().run()
